@@ -3,6 +3,7 @@
 // ============================================================================
 
 use crate::interfaces::{OrderBook, Price, Quantity, Side, Update};
+use std::collections::BTreeMap;
 
 pub struct OrderBookImpl {
     bids : BTreeMap<Price,Quantity>,
@@ -18,22 +19,59 @@ impl OrderBook for OrderBookImpl {
     }
 
     fn apply_update(&mut self, update: Update) {
-        panic!("Todo")
-    }
+        
+            
+                
+
+            match update {
+                Update::Set { price, quantity, side } => {
+                    match side {
+                        Side::Bid => {
+                            self.bids.insert(price, quantity);
+                        }
+                        Side::Ask => {
+                            self.asks.insert(price, quantity);
+                        }
+                        
+                }
+                Update::Remove { price, side } => {
+        // À compléter
+                    Side::quantity =>{
+                        
+                    }
+                }
+}
+}
+        }
+    
 
     fn get_spread(&self) -> Option<Price> {
-        panic!("Todo")
+        let best_bid = self.get_best_bid();
+
+        match best_bid {
+            Some(bid)=>{
+                let best_ask = self.get_best_ask();
+                match best_ask {
+                    Some(ask) =>{
+                        Some(ask - bid)
+                    }
+                    None => None,
+                }
+
+            }
+            None => None,
+        }
+
+
+        
     }
 
     fn get_best_bid(&self) -> Option<Price> {
-        match op.get_best_bid(){
-            Some(price) => println!("meilleur bid : {price}"),
-            None => println!("Aucun achat"),
-        }
+        self.bids.last_key_value().map(|(&price, _)| price)
     }
 
     fn get_best_ask(&self) -> Option<Price> {
-        panic!(
+        self.asks.first_key_value().map(|(&price, _)| price)
     }
 
     fn get_quantity_at(&self, price: Price, side: Side) -> Option<Quantity> {
