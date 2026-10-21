@@ -4,11 +4,17 @@
 
 use crate::interfaces::{OrderBook, Price, Quantity, Side, Update};
 
-pub struct OrderBookImpl {}
+pub struct OrderBookImpl {
+    bids : BTreeMap<Price,Quantity>,
+    asks : BTreeMap<Price,Quantity>,
+}
 
 impl OrderBook for OrderBookImpl {
     fn new() -> Self {
-        panic!("Todo")
+        OrderBookImpl{
+            bids : BTreeMap::new(),
+            asks : BTreeMap::new(),
+        }
     }
 
     fn apply_update(&mut self, update: Update) {
@@ -20,11 +26,14 @@ impl OrderBook for OrderBookImpl {
     }
 
     fn get_best_bid(&self) -> Option<Price> {
-        panic!("Todo")
+        match op.get_best_bid(){
+            Some(price) => println!("meilleur bid : {price}"),
+            None => println!("Aucun achat"),
+        }
     }
 
     fn get_best_ask(&self) -> Option<Price> {
-        panic!("Todo")
+        panic!(
     }
 
     fn get_quantity_at(&self, price: Price, side: Side) -> Option<Quantity> {
