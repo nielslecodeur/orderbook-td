@@ -91,7 +91,7 @@ impl OrderBookBenchmark {
 
             let start = Instant::now();
             for _ in 0..BATCH {
-                black_box(ob.apply_update(update.clone()));
+                ob.apply_update(black_box(update.clone()));
             }
             let elapsed = start.elapsed().as_nanos() as f64;
 
@@ -110,7 +110,7 @@ impl OrderBookBenchmark {
         for _ in 0..iterations {
             let start = Instant::now();
             for _ in 0..BATCH {
-                black_box(ob.get_spread());
+                black_box(black_box(ob).get_spread());
             }
             let elapsed = start.elapsed().as_nanos() as f64;
             timings.push(elapsed / BATCH as f64);
@@ -128,7 +128,7 @@ impl OrderBookBenchmark {
         for _ in 0..iterations {
             let start = Instant::now();
             for _ in 0..BATCH {
-                black_box(ob.get_best_bid());
+                black_box(black_box(ob).get_best_bid());
             }
             let elapsed = start.elapsed().as_nanos() as f64;
             timings.push(elapsed / BATCH as f64);
@@ -146,7 +146,7 @@ impl OrderBookBenchmark {
         for _ in 0..iterations {
             let start = Instant::now();
             for _ in 0..BATCH {
-                black_box(ob.get_best_ask());
+                black_box(black_box(ob).get_best_ask());
             }
             let elapsed = start.elapsed().as_nanos() as f64;
             timings.push(elapsed / BATCH as f64);
@@ -168,7 +168,7 @@ impl OrderBookBenchmark {
 
             let start = Instant::now();
             for _ in 0..BATCH {
-                black_box(ob.get_quantity_at(price, side));
+                black_box(black_box(ob).get_quantity_at(price, side));
             }
             let elapsed = start.elapsed().as_nanos() as f64;
             timings.push(elapsed / BATCH as f64);

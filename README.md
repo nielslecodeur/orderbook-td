@@ -2,6 +2,30 @@
 
 A competitive programming challenge to build the fastest possible order book data structure in Rust. The goal is to achieve sub-nanosecond operations for critical hot-path functions.
 
+## Comparaison des deux versions
+
+Les deux carnets implémentent le même trait `OrderBook` et passent les mêmes tests.
+
+- **BTreeMap** utilise un arbre ordonné par côté. [Code de la version de référence](src/orderbook.rs)
+- **Vec trié** conserve les prix dans l’ordre croissant. Une recherche binaire trouve le niveau à modifier. Le meilleur achat est le dernier élément et la meilleure vente est le premier. [Code de la version Vec](src/vec_orderbook.rs)
+
+```sh
+cargo test
+cargo run --release
+```
+
+Le programme mesure les deux versions sur la même suite d’opérations. Chaque valeur ci-dessous est la médiane des temps moyens de trois exécutions locales, en nanosecondes par appel.
+
+| Opération | BTreeMap | Vec trié |
+|---|---:|---:|
+| Mise à jour (`Set`) | 9,18 | 8,49 |
+| Meilleur achat | 1,35 | 0,63 |
+| Meilleure vente | 1,31 | 0,47 |
+| Spread | 2,07 | 0,72 |
+| Quantité à un prix | 6,48 | 7,50 |
+
+Sur cette charge, le Vec calcule le spread environ 2,9 fois plus vite. La BTreeMap retrouve plus vite la quantité à un prix donné. Le benchmark répète chaque `Set` 1 000 fois et ne mesure aucune suppression. Il mesure donc surtout le remplacement de quantités. Une insertion ou une suppression au milieu du Vec peut déplacer tous les niveaux suivants.
+
 ## Objective
 
 Complete the `OrderBook` trait implementation in `src/orderbook.rs` and optimize it for maximum performance. The faster your implementation, the better!
@@ -19,7 +43,8 @@ An order book is a fundamental data structure in financial trading systems that 
 src/
 ├── main.rs          # Entry point with benchmarks and tests
 ├── interfaces.rs    # OrderBook trait and type definitions
-├── orderbook.rs     # Your implementation goes here (currently TODO)
+├── orderbook.rs     # BTreeMap implementation
+├── vec_orderbook.rs # Sorted Vec implementation
 └── benchmarks.rs    # Comprehensive benchmarking framework
 ```
 
@@ -38,7 +63,7 @@ Implement the `OrderBook` trait with the following methods:
 - `get_top_levels(&self, side: Side, n: usize) -> Vec<(Price, Quantity)>`
 - `get_total_quantity(&self, side: Side) -> Quantity`
 
-## Getting Started
+## Original exercise instructions
 
 1. **Clone and setup**:
    ```bash
