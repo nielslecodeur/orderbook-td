@@ -10,6 +10,15 @@ pub struct OrderBookImpl {
     asks : BTreeMap<Price,Quantity>,
 }
 
+impl OrderBookImpl {
+    fn levels(&self, side: Side) -> &BTreeMap<Price, Quantity> {
+        match side {
+            Side::Bid => &self.bids,
+            Side::Ask => &self.asks,
+        }
+    }
+}
+
 impl OrderBook for OrderBookImpl {
     fn new() -> Self {
         OrderBookImpl{
@@ -19,31 +28,22 @@ impl OrderBook for OrderBookImpl {
     }
 
     fn apply_update(&mut self, update: Update) {
-        
-            
-                
+        let (side, price, quantity) = match update {
+            Update::Set { side, price, quantity } => (side, price, quantity),
+            Update::Remove { side, price } => (side, price, 0),
+        };
 
-            match update {
-                Update::Set { price, quantity, side } => {
-                    match side {
-                        Side::Bid => {
-                            self.bids.insert(price, quantity);
-                        }
-                        Side::Ask => {
-                            self.asks.insert(price, quantity);
-                        }
-                        
-                }
-                Update::Remove { price, side } => {
-        // À compléter
-                    Side::quantity =>{
-                        
-                    }
-                }
-}
-}
+        let levels = match side {
+            Side::Bid => &mut self.bids,
+            Side::Ask => &mut self.asks,
+        };
+
+        if quantity == 0 {
+            levels.remove(&price);
+        } else {
+            levels.insert(price, quantity);
         }
-    
+    }
 
     fn get_spread(&self) -> Option<Price> {
         let best_bid = self.get_best_bid();
@@ -75,14 +75,18 @@ impl OrderBook for OrderBookImpl {
     }
 
     fn get_quantity_at(&self, price: Price, side: Side) -> Option<Quantity> {
-        panic!("Todo")
+        self.levels(side).get(&price).copied()
     }
 
     fn get_top_levels(&self, side: Side, n: usize) -> Vec<(Price, Quantity)> {
-        panic!("Todo")
+        let levels = self.levels(side).iter().map(|(&price, &quantity)| (price, quantity));
+        match side {
+            Side::Bid => levels.rev().take(n).collect(),
+            Side::Ask => levels.take(n).collect(),
+        }
     }
 
     fn get_total_quantity(&self, side: Side) -> Quantity {
-        panic!("Todo")
+        self.levels(side).values().sum()
     }
 }

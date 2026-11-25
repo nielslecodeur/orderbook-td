@@ -67,6 +67,13 @@ mod tests {
         assert_eq!(ob.get_best_ask(), Some(10050));
         assert_eq!(ob.get_spread(), Some(50));
         assert_eq!(ob.get_quantity_at(10000, Side::Bid), Some(100));
+        assert_eq!(ob.get_quantity_at(10050, Side::Ask), Some(80));
+        assert_eq!(ob.get_quantity_at(10050, Side::Bid), None);
+        assert_eq!(ob.get_top_levels(Side::Bid, 1), vec![(10000, 100)]);
+        assert_eq!(ob.get_top_levels(Side::Ask, 3), vec![(10050, 80), (10100, 120)]);
+        assert!(ob.get_top_levels(Side::Ask, 0).is_empty());
+        assert_eq!(ob.get_total_quantity(Side::Bid), 250);
+        assert_eq!(ob.get_total_quantity(Side::Ask), 200);
     }
 
     fn test_updates_and_removes<T: OrderBook>() {
